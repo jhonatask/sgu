@@ -2,6 +2,8 @@ package br.com.jproject.sgu.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +21,8 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @NotBlank(message = "O nome não pode estar em branco")
+    @NotNull(message = "O nome não pode null")
     private String name;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
