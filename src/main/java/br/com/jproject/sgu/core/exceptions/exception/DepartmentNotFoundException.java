@@ -1,4 +1,4 @@
-package br.com.jproject.sgu.infrastructure.exceptions.exception;
+package br.com.jproject.sgu.core.exceptions.exception;
 
 public class DepartmentNotFoundException extends RuntimeException{
 

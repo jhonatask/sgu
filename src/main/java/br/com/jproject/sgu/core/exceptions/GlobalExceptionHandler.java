@@ -1,7 +1,7 @@
-package br.com.jproject.sgu.infrastructure.exceptions;
+package br.com.jproject.sgu.core.exceptions;
 
-import br.com.jproject.sgu.infrastructure.exceptions.exception.DepartmentNotFoundException;
-import br.com.jproject.sgu.infrastructure.exceptions.exception.UserNotFoundException;
+import br.com.jproject.sgu.core.exceptions.exception.DepartmentNotFoundException;
+import br.com.jproject.sgu.core.exceptions.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

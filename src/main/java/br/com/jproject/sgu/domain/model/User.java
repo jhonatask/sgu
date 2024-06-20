@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -27,6 +28,12 @@ public class User {
     @Email(message = "O email deve ser válido")
     @NotBlank(message = "O email não pode estar em branco")
     private String email;
+
+    @NotBlank(message = "O telefone não pode estar em branco")
+    @NotNull(message = "O telefone não pode null")
+    private String telefone;
+
+    private Date dataCadastro;
 
     @ManyToOne
     @JoinColumn(name = "department_id", unique = true)
