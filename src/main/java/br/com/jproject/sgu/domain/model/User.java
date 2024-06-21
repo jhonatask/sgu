@@ -33,6 +33,13 @@ public class User {
     @NotNull(message = "O telefone não pode null")
     private String telefone;
 
+    @NotBlank
+    @NotNull
+    @Column(unique = true)
+    private String cpforcnpj;
+
+    private String password;
+
     private Date dataCadastro;
 
     @ManyToOne
