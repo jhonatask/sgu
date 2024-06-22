@@ -17,6 +17,7 @@ import java.util.UUID;
 @Table(name = "users")
 @Entity
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -38,9 +39,14 @@ public class User {
     @Column(unique = true)
     private String cpforcnpj;
 
+    @Column(name = "password")
     private String password;
 
-    private Date dataCadastro;
+    @Column(name = "datacadastro")
+    private Date datacadastro;
+
+    @Column(name = "dataalteracao")
+    private Date dataalteracao;
 
     @ManyToOne
     @JoinColumn(name = "department_id", unique = true)

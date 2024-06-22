@@ -8,9 +8,11 @@ import br.com.jproject.sgu.domain.model.Department;
 import br.com.jproject.sgu.domain.model.User;
 import br.com.jproject.sgu.domain.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,21 +35,14 @@ public class UserService {
         if (user.isPresent()){
             throw new RuntimeException("Náo e possivel cadastrar usuario com mesmo cpf");
         }
-        User newUser = new User();
-        Department department = departmentService.getDepartment(userRequestDTO.department_id);
-        newUser.setName(userRequestDTO.name);
-        newUser.setEmail(userRequestDTO.email);
-        newUser.setPassword(userRequestDTO.password);
-        newUser.setTelefone(userRequestDTO.telefone);
-        newUser.setCpforcnpj(userRequestDTO.cpfOrCnpj);
-        newUser.setDepartment(department);
-        userRepository.save(newUser);
+        User newUser = builderNewUser(userRequestDTO);
         return  userResponseMapperDTO.userToUserResponseDTO(newUser);
 
     }
 
-    public List<UserResponseDTO> getAllUsers() {
-        return  null;
+    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
+        Page<User> result = userRepository.findAll(pageable);
+        return result.map(userResponseMapperDTO::userToUserResponseDTO);
     }
 
     public UserResponseDTO getUserById(UUID id) {
@@ -57,12 +52,30 @@ public class UserService {
 
     public UserResponseDTO updateUser(UUID id, UserRequestDTO userDetails) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
-        userRepository.save(user);
+        setDataUser(userDetails, user);
         return userResponseMapperDTO.userToUserResponseDTO(user);
     }
 
     public void deleteUser(UUID id) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
         userRepository.delete(user);
+    }
+
+    private User builderNewUser(UserRequestDTO userRequestDTO) {
+        User user = new User();
+        user.setDatacadastro(new Date());
+        setDataUser(userRequestDTO, user);
+        return user;
+    }
+
+    private void setDataUser(UserRequestDTO userRequestDTO, User user) {
+        Department department = departmentService.getDepartment(userRequestDTO.department_id);
+        user.setName(userRequestDTO.name);
+        user.setEmail(userRequestDTO.email);
+        user.setPassword(userRequestDTO.password);
+        user.setTelefone(userRequestDTO.telefone);
+        user.setCpforcnpj(userRequestDTO.cpfOrCnpj);
+        user.setDepartment(department);
+        userRepository.save(user);
     }
 }
