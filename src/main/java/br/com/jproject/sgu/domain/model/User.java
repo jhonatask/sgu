@@ -1,5 +1,6 @@
 package br.com.jproject.sgu.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -19,7 +20,7 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @NotBlank(message = "O nome não pode estar em branco")
@@ -48,7 +49,8 @@ public class User {
     @Column(name = "dataalteracao")
     private Date dataalteracao;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", unique = true)
+    @JsonBackReference
     private Department department;
 }

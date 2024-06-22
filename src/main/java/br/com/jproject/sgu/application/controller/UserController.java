@@ -46,7 +46,7 @@ public class UserController {
 
     @Operation(summary = "Lista de usuarios")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Sucesso ao listar usuarios",
+            @ApiResponse(responseCode = "201", description = "Sucesso ao listar usuarios",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = UserResponseDTO.class)) }),
             @ApiResponse(responseCode = "400", description = "Error",
@@ -54,7 +54,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Error",
                     content = @Content) })
     @GetMapping
-    public ResponseEntity<Page<UserResponseDTO>> getAllUsers(@RequestParam(required = false) Pageable pageable) {
+    public ResponseEntity<Page<UserResponseDTO>> getAllUsers(Pageable pageable) {
         Page<UserResponseDTO> users = userService.getAllUsers(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
@@ -87,12 +87,12 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID id, @Valid @RequestBody UserRequestDTO userDetails) {
         UserResponseDTO user  = userService.updateUser(id, userDetails);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @Operation(summary = "Deletar um usuario")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Sucesso ao deletar um usuario",
+            @ApiResponse(responseCode = "204", description = "Sucesso ao deletar um usuario",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = UserResponseDTO.class)) }),
             @ApiResponse(responseCode = "400", description = "Error",
