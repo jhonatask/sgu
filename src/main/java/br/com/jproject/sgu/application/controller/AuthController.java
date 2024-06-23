@@ -2,6 +2,7 @@ package br.com.jproject.sgu.application.controller;
 
 import br.com.jproject.sgu.application.dto.response.ResponseTokenDTO;
 import br.com.jproject.sgu.application.dto.resquest.LoginRequestDTO;
+import br.com.jproject.sgu.core.exceptions.exception.InvalidPasswordException;
 import br.com.jproject.sgu.core.security.TokenService;
 import br.com.jproject.sgu.domain.model.User;
 import br.com.jproject.sgu.domain.repositories.UserRepository;
@@ -26,12 +27,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequestDTO body){
-        User user = userRepository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
-        if(passwordEncoder.matches(body.password(), user.getPassword())) {
-            String token = tokenService.generateToken(user);
-            return ResponseEntity.ok(new ResponseTokenDTO(token, user.getName()));
+        User user = userRepository.findByEmail(body.email()).orElseThrow(() -> new RuntimeException("Usuario náo encontrado"));
+        if(!passwordEncoder.matches(body.password(), user.getPassword())) {
+            throw new InvalidPasswordException("Senha incorreta");
         }
-        return ResponseEntity.badRequest().build();
+        String token = tokenService.generateToken(user);
+        return ResponseEntity.ok(new ResponseTokenDTO(token, user.getName()));
     }
 
 }

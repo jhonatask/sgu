@@ -1,6 +1,7 @@
 package br.com.jproject.sgu.core.exceptions;
 
 import br.com.jproject.sgu.core.exceptions.exception.DepartmentNotFoundException;
+import br.com.jproject.sgu.core.exceptions.exception.InvalidPasswordException;
 import br.com.jproject.sgu.core.exceptions.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DepartmentNotFoundException.class)
     public ResponseEntity<String> handleDepartmentNotFoundException(DepartmentNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
