@@ -58,7 +58,7 @@ public class UserServiceTest {
 
         userRequestDTO = new UserRequestDTO();
         userRequestDTO.setName("John Doe");
-        userRequestDTO.setCpfOrCnpj("12345678900");
+        userRequestDTO.setCpforcnpj("12345678900");
 
         userResponseDTO = new UserResponseDTO();
         userResponseDTO.setId(userId);

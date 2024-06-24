@@ -1,5 +1,6 @@
 package br.com.jproject.sgu.core.exceptions;
 
+import br.com.jproject.sgu.core.exceptions.exception.CpfAlreadyRegisteredException;
 import br.com.jproject.sgu.core.exceptions.exception.DepartmentNotFoundException;
 import br.com.jproject.sgu.core.exceptions.exception.InvalidPasswordException;
 import br.com.jproject.sgu.core.exceptions.exception.UserNotFoundException;
@@ -39,11 +40,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(CpfAlreadyRegisteredException.class)
+    public ResponseEntity<String> handleCpfAlreadyRegisteredException(CpfAlreadyRegisteredException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception ex) {
-        return new ResponseEntity<>("An unexpected error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("Algo inesperado aconteceu: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

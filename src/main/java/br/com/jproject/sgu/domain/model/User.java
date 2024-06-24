@@ -49,7 +49,7 @@ public class User {
     @Column(name = "dataalteracao")
     private Date dataalteracao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id", unique = true)
     @JsonBackReference
     private Department department;

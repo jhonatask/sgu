@@ -14,6 +14,6 @@ public class UserRequestDTO {
     public String email;
     public String password;
     public String telefone;
-    public String cpfOrCnpj;
-    public UUID department_id;
+    public String cpforcnpj;
+    public UUID department;
 }
