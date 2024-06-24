@@ -47,8 +47,9 @@ Importe o projeto na ide de preferencia ( Recomendo Intellij IDEA)
 `` <br><br>
 Atualize o arquivo application.properties  com as informações do seu banco de dados PostgreSQL: <br>
 Rode o projeto para criar as tabelas necessarias, use o swagger para criar um departamento e subistituir os dados da query 
-id na sql de criacao do usuario master <b>(Senha e Pamonha123*)</b> nao alterar codigo da senha pelo sql
-quando fizer o login poderar alterar dados do usuario,
+id na sql de criacao do usuario master <b>(Senha e Pamonha123*)</b> nao alterar codigo da senha aqui do sql, caso queira cadastrar um usuario via swagger
+o arquivo SecurityConfig na linha 38 (.anyRequest().permitAll()) execute o projeto, e cadastre usuario com senha que desejar.
+
 
 SQL insert usuario master<br>
 ``INSERT INTO public.users
