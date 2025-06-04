@@ -2,6 +2,7 @@ package br.com.jproject.sgu.application.controller;
 
 import br.com.jproject.sgu.application.dto.response.UserResponseDTO;
 import br.com.jproject.sgu.application.dto.resquest.UserRequestDTO;
+import br.com.jproject.sgu.domain.service.CsvService;
 import br.com.jproject.sgu.domain.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -24,9 +26,11 @@ public class UserController {
 
 
     private final UserService userService;
+    private final CsvService csvService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, CsvService csvService) {
         this.userService = userService;
+        this.csvService = csvService;
     }
 
     @Operation(summary = "Cadastra um novo usuario")
@@ -42,6 +46,25 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO user) {
         UserResponseDTO newUser = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
+    }
+
+    @Operation(summary = "Importar usuarios de um arquivo CSV")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sucesso ao importar os usuarios",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDTO.class)) }),
+            @ApiResponse(responseCode = "400", description = "Error",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Error",
+                    content = @Content) })
+    @PostMapping("/importar")
+    public ResponseEntity<String> importUserCsv() {
+        try {
+           csvService.importarTodosArquivos();
+            return ResponseEntity.status(HttpStatus.CREATED).body("Usuários importados com sucesso: ");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @Operation(summary = "Lista de usuarios")
@@ -72,6 +95,24 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable UUID id) {
         UserResponseDTO user = userService.getUserById(id);
         return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
+    @Operation(summary = "Buscar  usuario por nome")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sucesso ao buscar um usuario",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDTO.class)) }),
+            @ApiResponse(responseCode = "400", description = "Error",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Error",
+                    content = @Content) })
+    @GetMapping("/nome")
+    public ResponseEntity<List<UserResponseDTO>> getUserByNome(@RequestParam String nome) {
+        List<UserResponseDTO> users = userService.getUserByNome(nome);
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
 

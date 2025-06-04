@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ public class UserService {
     private final UserResponseMapperDTO userResponseMapperDTO;
     private final DepartmentService departmentService;
     private final PasswordEncoder passwordEncoder;
+
 
     public UserService(UserRepository userRepository, UserResponseMapperDTO userResponseMapperDTO, DepartmentService departmentService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -44,6 +46,7 @@ public class UserService {
 
     }
 
+
     public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
         Page<User> result = userRepository.findAll(pageable);
         return result.map(userResponseMapperDTO::userToUserResponseDTO);
@@ -52,6 +55,11 @@ public class UserService {
     public UserResponseDTO getUserById(UUID id) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
         return userResponseMapperDTO.userToUserResponseDTO(user);
+    }
+
+    public List<UserResponseDTO> getUserByNome(String nome) {
+        List<User> users = userRepository.findByNameContainingIgnoreCase(nome);
+        return users.stream().map(userResponseMapperDTO::userToUserResponseDTO).toList();
     }
 
     public UserResponseDTO updateUser(UUID id, UserRequestDTO userDetails) {

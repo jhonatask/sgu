@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -119,5 +120,28 @@ public class UserServiceTest {
 
         userService.deleteUser(userId);
         verify(userRepository, times(1)).delete(user);
+    }
+
+    @Test
+    public void quandoBuscarUsuariosPorNome_entaoRetornaListaDeUsuarios() {
+        String nome = "John";
+        List<User> users = Collections.singletonList(user);
+        when(userRepository.findByNameContainingIgnoreCase(nome)).thenReturn(users);
+        when(userResponseMapperDTO.userToUserResponseDTO(any(User.class))).thenReturn(userResponseDTO);
+
+        List<UserResponseDTO> result = userService.getUserByNome(nome);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo(user.getName());
+    }
+
+    @Test
+    public void quandoBuscarUsuariosPorNomeENaoExistir_entaoRetornaListaVazia() {
+        String nome = "NomeInexistente";
+        when(userRepository.findByNameContainingIgnoreCase(nome)).thenReturn(Collections.emptyList());
+
+        List<UserResponseDTO> result = userService.getUserByNome(nome);
+
+        assertThat(result).isEmpty();
     }
 }
