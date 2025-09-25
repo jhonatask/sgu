@@ -72,4 +72,21 @@ public class User {
         this.datacadastro = LocalDateTime.now();
         this.dataalteracao = LocalDateTime.now();
     }
+    
+    // Setters para compatibilidade com Value Objects
+    public void setEmail(String email) {
+        this.email = new Email(email);
+    }
+    
+    public void setTelefone(String telefone) {
+        this.telefone = new Telefone(telefone);
+    }
+    
+    public void setEmail(Email email) {
+        this.email = email;
+    }
+    
+    public void setTelefone(Telefone telefone) {
+        this.telefone = telefone;
+    }
 }

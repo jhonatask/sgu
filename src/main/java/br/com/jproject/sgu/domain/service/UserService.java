@@ -16,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -97,7 +97,7 @@ public class UserService {
 
     private User builderNewUser(UserRequestDTO userRequestDTO) {
         User user = new User();
-        user.setDatacadastro(new Date());
+        user.setDatacadastro(LocalDateTime.now());
         setDataUser(userRequestDTO, user);
         return user;
     }
@@ -105,11 +105,12 @@ public class UserService {
     private void setDataUser(UserRequestDTO userRequestDTO, User user) {
         Department department = departmentService.getDepartment(userRequestDTO.department);
         user.setName(userRequestDTO.name);
-        user.setEmail(userRequestDTO.email);
+        user.setEmail(userRequestDTO.email); // Usa o setter que aceita String
         if(!(userRequestDTO.getPassword() == null)) user.setPassword(passwordEncoder.encode(userRequestDTO.password));
-        user.setTelefone(userRequestDTO.telefone);
+        user.setTelefone(userRequestDTO.telefone); // Usa o setter que aceita String
         user.setCpforcnpj(userRequestDTO.cpforcnpj);
         user.setDepartment(department);
+        user.setDataalteracao(LocalDateTime.now());
         userRepository.save(user);
     }
 }

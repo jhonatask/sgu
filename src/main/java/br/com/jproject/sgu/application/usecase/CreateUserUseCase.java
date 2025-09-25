@@ -1,20 +1,20 @@
 package br.com.jproject.sgu.application.usecase;
 
-import br.com.jproject.sgu.application.dto.request.UserRequestDTO;
+
 import br.com.jproject.sgu.application.dto.response.UserResponseDTO;
-import br.com.jproject.sgu.domain.model.User;
-import br.com.jproject.sgu.domain.repository.UserRepository;
-import br.com.jproject.sgu.domain.service.DepartmentService;
-import br.com.jproject.sgu.domain.mapper.UserResponseMapperDTO;
+import br.com.jproject.sgu.application.dto.resquest.UserRequestDTO;
 import br.com.jproject.sgu.core.exceptions.exception.CpfAlreadyRegisteredException;
 import br.com.jproject.sgu.core.exceptions.exception.EmailAlreadyRegisteredException;
-import br.com.jproject.sgu.core.constants.ErrorMessages;
+import br.com.jproject.sgu.domain.mapper.UserResponseMapperDTO;
+import br.com.jproject.sgu.domain.model.User;
+import br.com.jproject.sgu.domain.repositories.UserRepository;
+import br.com.jproject.sgu.domain.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
@@ -53,16 +53,17 @@ public class CreateUserUseCase {
     private User buildNewUser(UserRequestDTO userRequestDTO) {
         User user = new User();
         user.setName(userRequestDTO.getName());
-        user.setEmail(userRequestDTO.getEmail());
-        user.setTelefone(userRequestDTO.getTelefone());
+        user.setEmail(userRequestDTO.getEmail()); // Usa o setter que aceita String
+        user.setTelefone(userRequestDTO.getTelefone()); // Usa o setter que aceita String
         user.setCpforcnpj(userRequestDTO.getCpforcnpj());
-        user.setDatacadastro(new Date());
+        user.setDatacadastro(LocalDateTime.now());
         
         if (userRequestDTO.getPassword() != null && !userRequestDTO.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
         }
         
         user.setDepartment(departmentService.getDepartment(userRequestDTO.getDepartment()));
+        user.setDataalteracao(LocalDateTime.now());
         
         return user;
     }

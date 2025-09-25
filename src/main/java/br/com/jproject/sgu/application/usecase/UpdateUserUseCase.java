@@ -1,20 +1,25 @@
 package br.com.jproject.sgu.application.usecase;
 
-import br.com.jproject.sgu.application.dto.request.UserRequestDTO;
+
 import br.com.jproject.sgu.application.dto.response.UserResponseDTO;
+import br.com.jproject.sgu.application.dto.resquest.UserRequestDTO;
 import br.com.jproject.sgu.core.exceptions.exception.CpfAlreadyRegisteredException;
 import br.com.jproject.sgu.core.exceptions.exception.EmailAlreadyRegisteredException;
 import br.com.jproject.sgu.core.exceptions.exception.UserNotFoundException;
 import br.com.jproject.sgu.core.constants.ErrorMessages;
 import br.com.jproject.sgu.domain.mapper.UserResponseMapperDTO;
 import br.com.jproject.sgu.domain.model.User;
-import br.com.jproject.sgu.domain.repository.UserRepository;
+
+import br.com.jproject.sgu.domain.repositories.UserRepository;
 import br.com.jproject.sgu.domain.service.DepartmentService;
+import br.com.jproject.sgu.domain.valueobject.Email;
+import br.com.jproject.sgu.domain.valueobject.Telefone;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,8 +60,8 @@ public class UpdateUserUseCase {
 
     private void updateUserData(User user, UserRequestDTO userRequestDTO) {
         user.setName(userRequestDTO.getName());
-        user.setEmail(userRequestDTO.getEmail());
-        user.setTelefone(userRequestDTO.getTelefone());
+        user.setEmail(new Email(userRequestDTO.getEmail()));
+        user.setTelefone(new Telefone(userRequestDTO.getTelefone()));
         user.setCpforcnpj(userRequestDTO.getCpforcnpj());
         
         if (userRequestDTO.getPassword() != null && !userRequestDTO.getPassword().isEmpty()) {
@@ -64,5 +69,6 @@ public class UpdateUserUseCase {
         }
         
         user.setDepartment(departmentService.getDepartment(userRequestDTO.getDepartment()));
+        user.setDataalteracao(LocalDateTime.now());
     }
 }
