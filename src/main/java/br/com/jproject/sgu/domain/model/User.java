@@ -1,15 +1,16 @@
 package br.com.jproject.sgu.domain.model;
 
+import br.com.jproject.sgu.domain.valueobject.Email;
+import br.com.jproject.sgu.domain.valueobject.Telefone;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -25,32 +26,50 @@ public class User {
 
     @NotBlank(message = "O nome não pode estar em branco")
     @NotNull(message = "O nome não pode null")
+    @Column(length = 100)
     private String name;
 
-    @Email(message = "O email deve ser válido")
-    @NotBlank(message = "O email não pode estar em branco")
-    private String email;
+    @Embedded
+    private Email email;
 
-    @NotBlank(message = "O telefone não pode estar em branco")
-    @NotNull(message = "O telefone não pode null")
-    private String telefone;
+    @Embedded
+    private Telefone telefone;
 
     @NotBlank
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, length = 20)
     private String cpforcnpj;
 
-    @Column(name = "password")
+    @Column(name = "password", length = 255)
     private String password;
 
     @Column(name = "datacadastro")
-    private Date datacadastro;
+    private LocalDateTime datacadastro;
 
     @Column(name = "dataalteracao")
-    private Date dataalteracao;
+    private LocalDateTime dataalteracao;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "department_id", unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
     @JsonBackReference
     private Department department;
+    
+    // Métodos de negócio
+    public void updateData(String name, Email email, Telefone telefone, String cpforcnpj) {
+        this.name = name;
+        this.email = email;
+        this.telefone = telefone;
+        this.cpforcnpj = cpforcnpj;
+        this.dataalteracao = LocalDateTime.now();
+    }
+    
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
+        this.dataalteracao = LocalDateTime.now();
+    }
+    
+    public void setInitialData() {
+        this.datacadastro = LocalDateTime.now();
+        this.dataalteracao = LocalDateTime.now();
+    }
 }

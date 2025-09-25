@@ -2,22 +2,64 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:15-alpine
     container_name: sgu_postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: dbsgu
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Pamonha123*
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
       - sgu-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    container_name: sgu_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sgu-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  app:
+    build: .
+    container_name: sgu_app
+    restart: unless-stopped
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/dbsgu
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-here}
+      - SPRING_PROFILES_ACTIVE=prod
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - sgu-network
 
 volumes:
   pgdata:
+  redis_data:
 
 networks:
   sgu-network:

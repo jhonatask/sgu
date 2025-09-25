@@ -2,6 +2,9 @@ package br.com.jproject.sgu.application.controller;
 
 import br.com.jproject.sgu.application.dto.response.UserResponseDTO;
 import br.com.jproject.sgu.application.dto.resquest.UserRequestDTO;
+import br.com.jproject.sgu.application.usecase.CreateUserUseCase;
+import br.com.jproject.sgu.application.usecase.GetUsersUseCase;
+import br.com.jproject.sgu.application.usecase.UpdateUserUseCase;
 import br.com.jproject.sgu.domain.service.CsvService;
 import br.com.jproject.sgu.domain.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,17 +25,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "*")
+@RequiredArgsConstructor
 public class UserController {
-
 
     private final UserService userService;
     private final CsvService csvService;
-
-    public UserController(UserService userService, CsvService csvService) {
-        this.userService = userService;
-        this.csvService = csvService;
-    }
+    private final CreateUserUseCase createUserUseCase;
+    private final GetUsersUseCase getUsersUseCase;
+    private final UpdateUserUseCase updateUserUseCase;
 
     @Operation(summary = "Cadastra um novo usuario")
     @ApiResponses(value = {
@@ -44,7 +45,7 @@ public class UserController {
                     content = @Content) })
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO user) {
-        UserResponseDTO newUser = userService.createUser(user);
+        UserResponseDTO newUser = createUserUseCase.execute(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
@@ -78,7 +79,7 @@ public class UserController {
                     content = @Content) })
     @GetMapping
     public ResponseEntity<Page<UserResponseDTO>> getAllUsers(Pageable pageable) {
-        Page<UserResponseDTO> users = userService.getAllUsers(pageable);
+        Page<UserResponseDTO> users = getUsersUseCase.execute(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
@@ -127,7 +128,7 @@ public class UserController {
                     content = @Content) })
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID id, @Valid @RequestBody UserRequestDTO userDetails) {
-        UserResponseDTO user  = userService.updateUser(id, userDetails);
+        UserResponseDTO user = updateUserUseCase.execute(id, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 

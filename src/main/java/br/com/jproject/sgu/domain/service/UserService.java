@@ -3,7 +3,9 @@ package br.com.jproject.sgu.domain.service;
 import br.com.jproject.sgu.application.dto.response.UserResponseDTO;
 import br.com.jproject.sgu.application.dto.resquest.UserRequestDTO;
 import br.com.jproject.sgu.core.exceptions.exception.CpfAlreadyRegisteredException;
+import br.com.jproject.sgu.core.exceptions.exception.EmailAlreadyRegisteredException;
 import br.com.jproject.sgu.core.exceptions.exception.UserNotFoundException;
+import br.com.jproject.sgu.core.constants.ErrorMessages;
 import br.com.jproject.sgu.domain.mapper.UserResponseMapperDTO;
 import br.com.jproject.sgu.domain.model.Department;
 import br.com.jproject.sgu.domain.model.User;
@@ -37,13 +39,20 @@ public class UserService {
     }
 
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
-        Optional<User> user = userRepository.findBycpforcnpj(userRequestDTO.cpforcnpj);
-        if (user.isPresent()){
-            throw new CpfAlreadyRegisteredException("Náo e possivel cadastrar usuario com mesmo cpf");
+        // Validar CPF/CNPJ duplicado
+        Optional<User> existingUser = userRepository.findBycpforcnpj(userRequestDTO.cpforcnpj);
+        if (existingUser.isPresent()){
+            throw new CpfAlreadyRegisteredException();
         }
+        
+        // Validar email duplicado
+        Optional<User> existingEmail = userRepository.findByEmail(userRequestDTO.email);
+        if (existingEmail.isPresent()){
+            throw new EmailAlreadyRegisteredException();
+        }
+        
         User newUser = builderNewUser(userRequestDTO);
-        return  userResponseMapperDTO.userToUserResponseDTO(newUser);
-
+        return userResponseMapperDTO.userToUserResponseDTO(newUser);
     }
 
 
@@ -64,6 +73,19 @@ public class UserService {
 
     public UserResponseDTO updateUser(UUID id, UserRequestDTO userDetails) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+        
+        // Validar CPF/CNPJ duplicado (exceto para o próprio usuário)
+        Optional<User> existingUser = userRepository.findBycpforcnpj(userDetails.cpforcnpj);
+        if (existingUser.isPresent() && !existingUser.get().getId().equals(id)){
+            throw new CpfAlreadyRegisteredException(ErrorMessages.CPF_ALREADY_REGISTERED_UPDATE);
+        }
+        
+        // Validar email duplicado (exceto para o próprio usuário)
+        Optional<User> existingEmail = userRepository.findByEmail(userDetails.email);
+        if (existingEmail.isPresent() && !existingEmail.get().getId().equals(id)){
+            throw new EmailAlreadyRegisteredException(ErrorMessages.EMAIL_ALREADY_REGISTERED_UPDATE);
+        }
+        
         setDataUser(userDetails, user);
         return userResponseMapperDTO.userToUserResponseDTO(user);
     }
