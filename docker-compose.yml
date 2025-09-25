@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgres
     container_name: sgu_postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: dbsgu
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
-      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=pt_BR.UTF-8"
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
     ports:
       - "5432:5432"
     volumes:
@@ -24,7 +24,7 @@ services:
       start_period: 30s
 
   redis:
-    image: redis:7-alpine
+    image: redis
     container_name: sgu_redis
     restart: unless-stopped
     ports:
@@ -38,26 +38,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
-  app:
-    build: .
-    container_name: sgu_app
-    restart: unless-stopped
-    environment:
-      - DB_URL=jdbc:postgresql://postgres:5432/dbsgu
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=${DB_PASSWORD:-password}
-      - JWT_SECRET=${JWT_SECRET:-your-secret-key-here}
-      - SPRING_PROFILES_ACTIVE=prod
-    ports:
-      - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - sgu-network
 
 volumes:
   pgdata:

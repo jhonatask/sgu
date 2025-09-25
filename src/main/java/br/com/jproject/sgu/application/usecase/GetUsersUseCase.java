@@ -2,8 +2,8 @@ package br.com.jproject.sgu.application.usecase;
 
 import br.com.jproject.sgu.application.dto.response.UserResponseDTO;
 import br.com.jproject.sgu.domain.model.User;
-import br.com.jproject.sgu.domain.repository.UserRepository;
 import br.com.jproject.sgu.domain.mapper.UserResponseMapperDTO;
+import br.com.jproject.sgu.domain.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
