@@ -1,5 +1,6 @@
 package br.com.jproject.sgu.domain.valueobject;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class Email {
         "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
     );
     
+    @Column(name = "email")
     private String value;
     
     public Email(String email) {

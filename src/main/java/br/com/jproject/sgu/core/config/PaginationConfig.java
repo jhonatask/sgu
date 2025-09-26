@@ -12,8 +12,6 @@ public class PaginationConfig {
     public PageableHandlerMethodArgumentResolverCustomizer paginationCustomizer() {
         return pageableResolver -> {
             pageableResolver.setMaxPageSize(100); // Máximo 100 itens por página
-            pageableResolver.setPageParameter("page");
-            pageableResolver.setSizeParameter("size");
             pageableResolver.setOneIndexedParameters(false); // Página começa em 0
         };
     }

@@ -1,5 +1,6 @@
 package br.com.jproject.sgu.domain.valueobject;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class Telefone {
         "^\\(?[1-9]{2}\\)?[0-9]{4,5}-?[0-9]{4}$"
     );
     
+    @Column(name = "telefone")
     private String value;
     
     public Telefone(String telefone) {

@@ -11,6 +11,8 @@ import br.com.jproject.sgu.domain.model.Department;
 import br.com.jproject.sgu.domain.model.User;
 import br.com.jproject.sgu.domain.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,15 +40,16 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @CacheEvict(value = {"users", "user-by-email", "user-by-cpf", "users-by-name", "users-by-department", "users-by-date-range"}, allEntries = true)
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
         // Validar CPF/CNPJ duplicado
-        Optional<User> existingUser = userRepository.findBycpforcnpj(userRequestDTO.cpforcnpj);
+        Optional<User> existingUser = userRepository.findBycpforcnpj(userRequestDTO.getCpforcnpj());
         if (existingUser.isPresent()){
             throw new CpfAlreadyRegisteredException();
         }
         
         // Validar email duplicado
-        Optional<User> existingEmail = userRepository.findByEmail(userRequestDTO.email);
+        Optional<User> existingEmail = userRepository.findByEmail(userRequestDTO.getEmail());
         if (existingEmail.isPresent()){
             throw new EmailAlreadyRegisteredException();
         }
@@ -71,17 +74,18 @@ public class UserService {
         return users.stream().map(userResponseMapperDTO::userToUserResponseDTO).toList();
     }
 
+    @CacheEvict(value = {"users", "user-by-email", "user-by-cpf", "users-by-name", "users-by-department", "users-by-date-range"}, allEntries = true)
     public UserResponseDTO updateUser(UUID id, UserRequestDTO userDetails) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
         
         // Validar CPF/CNPJ duplicado (exceto para o próprio usuário)
-        Optional<User> existingUser = userRepository.findBycpforcnpj(userDetails.cpforcnpj);
+        Optional<User> existingUser = userRepository.findBycpforcnpj(userDetails.getCpforcnpj());
         if (existingUser.isPresent() && !existingUser.get().getId().equals(id)){
             throw new CpfAlreadyRegisteredException(ErrorMessages.CPF_ALREADY_REGISTERED_UPDATE);
         }
         
         // Validar email duplicado (exceto para o próprio usuário)
-        Optional<User> existingEmail = userRepository.findByEmail(userDetails.email);
+        Optional<User> existingEmail = userRepository.findByEmail(userDetails.getEmail());
         if (existingEmail.isPresent() && !existingEmail.get().getId().equals(id)){
             throw new EmailAlreadyRegisteredException(ErrorMessages.EMAIL_ALREADY_REGISTERED_UPDATE);
         }
@@ -90,6 +94,7 @@ public class UserService {
         return userResponseMapperDTO.userToUserResponseDTO(user);
     }
 
+    @CacheEvict(value = {"users", "user-by-email", "user-by-cpf", "users-by-name", "users-by-department", "users-by-date-range"}, allEntries = true)
     public void deleteUser(UUID id) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
         userRepository.delete(user);
@@ -102,13 +107,14 @@ public class UserService {
         return user;
     }
 
+    @CacheEvict(value = {"users", "user-by-email", "user-by-cpf", "users-by-name", "users-by-department", "users-by-date-range"}, allEntries = true)
     private void setDataUser(UserRequestDTO userRequestDTO, User user) {
-        Department department = departmentService.getDepartment(userRequestDTO.department);
-        user.setName(userRequestDTO.name);
-        user.setEmail(userRequestDTO.email); // Usa o setter que aceita String
-        if(!(userRequestDTO.getPassword() == null)) user.setPassword(passwordEncoder.encode(userRequestDTO.password));
-        user.setTelefone(userRequestDTO.telefone); // Usa o setter que aceita String
-        user.setCpforcnpj(userRequestDTO.cpforcnpj);
+        Department department = departmentService.getDepartment(userRequestDTO.getDepartment());
+        user.setName(userRequestDTO.getName());
+        user.setEmail(userRequestDTO.getEmail()); // Usa o setter que aceita String
+        if(!(userRequestDTO.getPassword() == null)) user.setPassword(passwordEncoder.encode(userRequestDTO.getPassword()));
+        user.setTelefone(userRequestDTO.getTelefone()); // Usa o setter que aceita String
+        user.setCpforcnpj(userRequestDTO.getCpforcnpj());
         user.setDepartment(department);
         user.setDataalteracao(LocalDateTime.now());
         userRepository.save(user);

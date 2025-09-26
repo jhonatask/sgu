@@ -26,7 +26,7 @@ public class UserRequestDTO {
     private String email;
     
     @Size(min = 8, max = 128, message = ErrorMessages.PASSWORD_SIZE)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]", 
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$", 
              message = ErrorMessages.PASSWORD_PATTERN)
     private String password;
     

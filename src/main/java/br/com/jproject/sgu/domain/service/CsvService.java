@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class CsvService {
@@ -77,6 +79,54 @@ public class CsvService {
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void importarArquivoUpload(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Arquivo não pode estar vazio");
+        }
+
+        if (!file.getOriginalFilename().toLowerCase().endsWith(".csv")) {
+            throw new IllegalArgumentException("Arquivo deve ser do tipo CSV");
+        }
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            String linha;
+            boolean primeiraLinha = true;
+            int linhaNumero = 0;
+            
+            while ((linha = reader.readLine()) != null) {
+                linhaNumero++;
+                
+                if (primeiraLinha) {
+                    primeiraLinha = false;
+                    continue;
+                }
+                
+                // Ignora linhas vazias ou com menos de 6 campos
+                String[] campos = linha.split(",");
+                if (campos.length < 6) {
+                    System.out.println("Linha " + linhaNumero + " ignorada: campos insuficientes");
+                    continue;
+                }
+
+                try {
+                    userService.createUser(
+                            UserRequestDTO.builder()
+                                    .cpforcnpj(campos[0])
+                                    .name(campos[1])
+                                    .email(campos[2])
+                                    .password(campos[3])
+                                    .department(UUID.fromString(campos[4]))
+                                    .telefone(campos[5])
+                                    .build()
+                    );
+                } catch (Exception e) {
+                    System.err.println("Erro ao processar linha " + linhaNumero + ": " + e.getMessage());
+                    // Continua processando outras linhas mesmo se uma falhar
+                }
+            }
         }
     }
 }

@@ -49,7 +49,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
-    @Operation(summary = "Importar usuarios de um arquivo CSV")
+    @Operation(summary = "Importar usuarios de um arquivo CSV do diretório configurado")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Sucesso ao importar os usuarios",
                     content = { @Content(mediaType = "application/json",
@@ -62,9 +62,28 @@ public class UserController {
     public ResponseEntity<String> importUserCsv() {
         try {
            csvService.importarTodosArquivos();
-            return ResponseEntity.status(HttpStatus.CREATED).body("Usuários importados com sucesso: ");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Usuários importados com sucesso do diretório configurado");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Importar usuarios de um arquivo CSV enviado via upload")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Sucesso ao importar os usuarios do arquivo",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserResponseDTO.class)) }),
+            @ApiResponse(responseCode = "400", description = "Error",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Error",
+                    content = @Content) })
+    @PostMapping(value = "/importar-upload", consumes = "multipart/form-data")
+    public ResponseEntity<String> importUserCsvUpload(@RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        try {
+            csvService.importarArquivoUpload(file);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Usuários importados com sucesso do arquivo: " + file.getOriginalFilename());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao importar arquivo: " + e.getMessage());
         }
     }
 
